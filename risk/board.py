@@ -18,7 +18,7 @@ Move = namedtuple('Attack', ['from_territory_id', 'from_armies',
 class Board(object):
     """
     The Board object keeps track of all armies situated on the Risk
-    world map. Through the definitions it knows the locations of and
+    world map.   Through the definitions it knows the locations of and
     connections between all territories. It handles ownership, attacks
     and movements of armies.
 
