@@ -11,8 +11,8 @@ from matplotlib.path import Path
 import risk.definitions
 
 Territory = namedtuple('Territory', ['territory_id', 'player_id', 'armies'])
-Move = namedtuple('Attack', ['from_territory_id', 'from_armies',
-                                'to_territory_id', 'to_player_id', 'to_armies'])
+Move = (namedtuple('Attack', ['from_territory_id', 'from_armies',
+            'to_territory_id', 'to_player_id', 'to_armies']))
 
 
 class Board(object):
@@ -48,8 +48,8 @@ class Board(object):
         """
         allocation = (list(range(n_players)) * 42)[0:42]
         random.shuffle(allocation)
-        return cls([Territory(territory_id=tid, player_id=pid, armies=1)
-                                    for tid, pid in enumerate(allocation)])
+        return (cls([Territory(territory_id=tid, player_id=pid, armies=1)
+                    for tid, pid in enumerate(allocation)]))
 
     # ====================== #
     # == Neighbor Methods == #
@@ -58,7 +58,7 @@ class Board(object):
     def neighbors(self, territory_id):
         """
         Create a generator of all territories neighboring a given territory.
- 
+
         Args:
             territory_id (int): ID of the territory to find neighbors of.
 
@@ -70,19 +70,20 @@ class Board(object):
 
     def hostile_neighbors(self, territory_id):
         """
-        Create a generator of all territories neighboring a given territory, of which
+        Create a generator of all territories neighboring a given
+        territory, of which
         the owner is not the same as the owner of the original territory.
  
         Args:
             territory_id (int): ID of the territory.
- 
+
         Returns:
             generator: Generator of Territories.
         """
         player_id = self.owner(territory_id)
         neighbor_ids = risk.definitions.territory_neighbors[territory_id]
         return (t for t in self.data if (t.player_id != player_id
-                                   and t.territory_id in neighbor_ids))
+                    and t.territory_id in neighbor_ids))
 
     def friendly_neighbors(self, territory_id):
         """
@@ -100,9 +101,8 @@ class Board(object):
         player_id = self.owner(territory_id)
         neighbor_ids = risk.definitions.territory_neighbors[territory_id]
         return (t for t in self.data if (t.player_id == player_id
-                                    and t.territory_id in neighbor_ids))
+                    and t.territory_id in neighbor_ids))
 
- 
     # ================== #
     # == Path Methods == #
     # ================== #
@@ -208,7 +208,8 @@ class Board(object):
             current_territory = deque1.popleft()
             if current_territory == target:
                 return d[current_territory]
-            for territory in risk.definitions.territory_neighbors[current_territory]:
+            for territory in (risk.definitions
+                            .territory_neighbors[current_territory]):
                 if territory not in tervis:
                     dictionarycopy = copy.deepcopy(d[current_territory])
                     dictionarycopy.append(territory)
@@ -612,9 +613,9 @@ class Board(object):
         plt.text(
             coor[0]*1.2,
             coor[1]*1.22 + 15,
-            s=str(armies),
-            ids = risk.definitions.player_colors[player_id]
-            color='black' if ids in ['yellow', 'pink'] else 'white',
+            s = str(armies),
+            color = ('black' if risk.definitions.player_colors[player_id]
+                in c else 'white'),
             ha='center',
             size=15
             )
@@ -642,8 +643,8 @@ class Board(object):
         attack_dices = sorted([C for _ in range(n_atk_dice)], reverse=True)
         defend_dices = sorted([C for _ in range(n_dfnd_dice)], reverse=True)
         W = [att_d > def_d for att_d, def_d in zip(attack_dices, defend_dices)]
-        B = len([w for w in W if w is True]
-        return len([w for w in W if w is False]), B)
+        return (len([w for w in wins if w is False])
+                            , len([w for w in wins if w is True]))
 
     @staticmethod
     def throw_dice():
@@ -690,9 +691,8 @@ class Board(object):
             territory_id (int): ID of the territory.
             player_id (int): ID of the player.
         """
-        a = Territory(a, player_id, self.armies(territory_id))
-        self.data[territory_id] = a
-
+        self.data[territory_id] = (Territory(territory_id, player_id,
+            self.armies(territory_id)))
     def set_armies(self, territory_id, n):
         """
         Set the number of armies on the territory.
@@ -705,10 +705,11 @@ class Board(object):
             ValueError if n < 1.
         """
         if n < 1:
-            b = 'Board: cannot set the number of armies to <1 ({tid}, {n}).'
-            raise ValueError(b.format(tid=territory_id, n=n)
-        a = Territory(territory_id, self.owner(territory_id), n)
-        self.data[territory_id] = a
+            raise (ValueError(('Board: cannot set the number' 
+                       ' of armies to <1 ({tid}, {n}).')
+                        .format(tid=territory_id, n=n)))
+        self.data[territory_id] = (Territory(territory_id,
+                                        self.owner(territory_id), n))
 
     def add_armies(self, territory_id, n):
         """
